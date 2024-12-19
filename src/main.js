@@ -12,48 +12,53 @@ function setupBanner(config) {
     const defaultConfig = {
         message: 'This site uses cookies to enhance your experience.',
         buttonText: 'Got it!',
-        position: 'bottom', // or 'top'
-        theme: 'light', // or 'dark'
-        onAccept: () => console.log('Cookies accepted!'),
     };
 
     // Merge user config with default config
     const finalConfig = { ...defaultConfig, ...config };
 
     // Create the banner element
-    const banner = document.createElement('div');
-    banner.style.position = 'fixed';
-    banner.style[finalConfig.position] = '0';
-    banner.style.width = '100%';
-    banner.style.padding = '10px';
-    banner.style.backgroundColor = finalConfig.theme === 'dark' ? '#333' : '#fff';
-    banner.style.color = finalConfig.theme === 'dark' ? '#fff' : '#000';
-    banner.style.textAlign = 'center';
-    banner.style.boxShadow = '0px -2px 5px rgba(0,0,0,0.2)';
+    function getComputedBodyStyle() {
+        const bodyStyles = window.getComputedStyle(document.body);
+        const bgColor = bodyStyles.backgroundColor || "rgb(255, 255, 255)";
+        return bgColor;
+    }
 
-    // Add message
-    const message = document.createElement('span');
-    message.textContent = finalConfig.message;
-    banner.appendChild(message);
+    // Function to invert RGB color
+    function invertColor(rgb) {
+        const colorMatch = rgb.match(/\d+/g);
+        if (!colorMatch || colorMatch.length < 3) return "#000000";
+        const r = 255 - parseInt(colorMatch[0]);
+        const g = 255 - parseInt(colorMatch[1]);
+        const b = 255 - parseInt(colorMatch[2]);
+        return `rgb(${r}, ${g}, ${b})`;
+    }
 
-    // Add button
-    const button = document.createElement('button');
-    button.textContent = finalConfig.buttonText;
-    button.style.marginLeft = '10px';
-    button.style.padding = '5px 10px';
-    button.style.border = 'none';
-    button.style.cursor = 'pointer';
-    button.style.backgroundColor = '#007BFF';
-    button.style.color = '#fff';
-    button.style.borderRadius = '3px';
-    button.onclick = () => {
-        document.body.removeChild(banner);
-        finalConfig.onAccept();
-    };
-    banner.appendChild(button);
+    const bodyColor = getComputedBodyStyle();
+    const invertedColor = invertColor(bodyColor);
 
-    // Append banner to the body
-    document.body.appendChild(banner);
+    // Create cookie consent pop-up
+    const popup = document.createElement("div");
+    popup.style.position = "fixed";
+    popup.style.bottom = "10px";
+    popup.style.right = "10px";
+    popup.style.padding = "15px";
+    popup.style.backgroundColor = invertedColor;
+    popup.style.color = bodyColor;
+    popup.style.borderRadius = "5px";
+    popup.style.boxShadow = "0 2px 5px rgba(0, 0, 0, 0.5)";
+    popup.style.zIndex = "9999";
+    popup.innerHTML = `
+        <p style="margin: 0; font-size: 14px;">${finalConfig.message}</p>
+        <button id="closeConsent" style="margin-top: 10px; padding: 5px 10px; background-color: ${bodyColor}; color: ${invertedColor}; border: none; border-radius: 3px; cursor: pointer;">${finalConfig.buttonText}</button>
+    `;
+
+    document.body.appendChild(popup);
+
+    // Add close button functionality
+    document.getElementById("closeConsent").addEventListener("click", function () {
+        popup.style.display = "none";
+    });
 }
 
 window.ckbnr = { init };

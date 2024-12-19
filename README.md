@@ -16,18 +16,10 @@
 
 ## use in project
 
-- newest version:
-
-        <script src="https://cdn.jsdelivr.net/gh/allink/ckbnr/dist/bundle.min.js"></script>
-
-- specific version:
-
         <script src="https://cdn.jsdelivr.net/gh/allink/ckbnr@1.0.0/dist/bundle.min.js"></script>
         <script>
             ckbnr.init({
                 message: 'This site uses cookies to enhance your experience.',
                 buttonText: 'Got it!',
-                position: 'bottom', // or 'top'
-                theme: 'dark' // or 'light'
             });
         </script>
