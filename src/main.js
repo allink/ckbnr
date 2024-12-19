@@ -1,4 +1,13 @@
 export function init(config) {
+    // Wait for DOMContentLoaded if document.body is not ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => setupBanner(config));
+    } else {
+        setupBanner(config);
+    }
+}
+
+function setupBanner(config) {
     // Default configuration
     const defaultConfig = {
         message: 'This site uses cookies to enhance your experience.',
