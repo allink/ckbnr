@@ -1,4 +1,6 @@
 export function init(config) {
+    updateGtag();
+
     // Wait for DOMContentLoaded if document.body is not ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => setupBanner(config));
@@ -7,11 +9,58 @@ export function init(config) {
     }
 }
 
+function updateGtag() {
+    var optOutCookie = document.cookie.replace(/(?:(?:^|.*;\s*)deny_all\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+
+    // Define dataLayer and the gtag function.
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+
+    if (optOutCookie == "true") {
+        // Default ad_storage to 'denied'.
+        gtag("consent", "default", {
+            "ad_user_data": "denied",
+            "ad_personalization": "denied",
+            "ad_storage": "denied",
+            "analytics_storage": "denied"
+        });
+    } else {
+        gtag("consent", "default", {
+            "ad_user_data": "granted",
+            "ad_personalization": "granted",
+            "ad_storage": "granted",
+            "analytics_storage": "granted"
+        });
+    }
+}
+
+export function optout() {
+    // Set the opt-out cookie
+    var denyAll = document.cookie.replace(/(?:(?:^|.*;\s*)deny_all\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+
+    if (denyAll == 'true') {
+        document.cookie = 'deny_all=; expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/';
+    } else {
+        var expirationDate = new Date();
+        expirationDate.setFullYear(expirationDate.getFullYear() + 1);
+        document.cookie = 'deny_all=true; expires=' + expirationDate.toUTCString() + '; path=/';
+        this.innerHTML = 'Opted out';
+    }
+
+    window.location.reload();
+
+    dataLayer.push({
+        'event': 'update_consent_state'
+    });
+};
+
 function setupBanner(config) {
     // Default configuration
     const defaultConfig = {
         message: 'This site uses cookies to enhance your experience.',
-        buttonText: 'Got it!',
     };
 
     // Merge user config with default config
@@ -50,7 +99,8 @@ function setupBanner(config) {
     popup.style.zIndex = "9999";
     popup.innerHTML = `
         <p style="margin: 0; font-size: 14px;">${finalConfig.message}</p>
-        <button id="closeConsent" style="margin-top: 10px; padding: 5px 10px; background-color: ${bodyColor}; color: ${invertedColor}; border: none; border-radius: 3px; cursor: pointer;">${finalConfig.buttonText}</button>
+        <button id="closeConsent" style="margin-top: 10px; padding: 5px 10px; background-color: ${bodyColor}; color: ${invertedColor}; border: none; border-radius: 3px; cursor: pointer;">i'm really good</button>
+        <button id="closeConsent" onClick="ckbnr.optout()" style="margin-top: 10px; padding: 5px 10px; background-color: ${bodyColor}; color: ${invertedColor}; border: none; border-radius: 3px; cursor: pointer;">reject all!</button>
     `;
 
     document.body.appendChild(popup);
@@ -60,5 +110,3 @@ function setupBanner(config) {
         popup.style.display = "none";
     });
 }
-
-window.ckbnr = { init };
