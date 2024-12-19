@@ -3,14 +3,14 @@ import json from '@rollup/plugin-json';
 import terser from '@rollup/plugin-terser';
 
 export default {
-	input: 'src/cookiebanner.js',
+	input: 'src/main.js',
 	output: [
 		{
-			file: 'dist/cookiebanner.js',
+			file: 'dist/bundle.js',
 			format: 'cjs'
 		},
 		{
-			file: 'dist/cookiebanner.min.js',
+			file: 'dist/bundle.min.js',
 			format: 'iife',
 			name: 'version',
 			plugins: [terser()]

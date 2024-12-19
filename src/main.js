@@ -47,4 +47,4 @@ export function init(config) {
     document.body.appendChild(banner);
 }
 
-window.CookieBanner = { init };
+window.Ckbnr = { init };
